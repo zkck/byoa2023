@@ -81,12 +81,12 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// get text from store
 	//data, ok := store[uuid]
-	data, err := redis.GetText(uuid)
+	data, found, err := redis.GetText(uuid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, Error{Error: err.Error()})
 	}
-	if !ok {
+	if !found {
 		w.WriteHeader(http.StatusNotFound)
 		encoder.Encode(Error{Error: "not found"})
 		return
@@ -113,7 +113,14 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	delete(store, uuid)
+	//delete(store, uuid)
+	err := redis.Delete(uuid)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, Error{Error: err.Error()})
+		return
+	}
+
 	w.WriteHeader(http.StatusNoContent)
 }
 
