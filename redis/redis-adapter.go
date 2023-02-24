@@ -46,13 +46,21 @@ func Store(uuid, value string) error {
 }
 
 func Search(uuid, term string) (bool, bool, error) {
-	_, err := rdbTokes.Get(ctx, term+"##!##"+uuid).Result()
-
+	_, err := rdbTexts.Get(ctx, uuid).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return false, false, nil
 		}
 		return false, false, err
+	}
+
+	_, err = rdbTokes.Get(ctx, term+"##!##"+uuid).Result()
+
+	if err != nil {
+		if err == redis.Nil {
+			return false, true, nil
+		}
+		return false, true, err
 	}
 	return true, true, nil
 }
@@ -69,7 +77,7 @@ func GetText(uuid string) (string, bool, error) {
 }
 
 func Delete(uuid string) (bool, error) {
-	value, _, err := GetText(uuid)
+	_, _, err := GetText(uuid)
 	if err != nil {
 		if err == redis.Nil {
 			return false, nil
@@ -78,14 +86,15 @@ func Delete(uuid string) (bool, error) {
 	}
 
 	_, err = rdbTexts.Del(ctx, uuid).Result()
-	splitValue := strings.Split(value, " ")
-	for _, element := range splitValue {
-		err = rdbTokes.Del(ctx, element+"##!##"+uuid).Err()
-	}
+	/*
+		splitValue := strings.Split(value, " ")
+		for _, element := range splitValue {
+			err = rdbTokes.Del(ctx, element+"##!##"+uuid).Err()
+		}*/
 	if err != nil {
-		if err == redis.Nil {
+		/*if err == redis.Nil {
 			return false, nil
-		}
+		}*/
 		return false, err
 	}
 	return true, nil
