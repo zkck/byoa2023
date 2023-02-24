@@ -40,7 +40,12 @@ func Search(uuid, term string) (bool, bool, error) {
 		}
 		return false, false, err
 	}
-	return strings.Contains(val, term), true, nil
+	for _, word := range strings.Split(val, " ") {
+		if word == term {
+			return true, true, nil
+		}
+	}
+	return false, true, nil
 }
 
 func GetText(uuid string) (string, bool, error) {
