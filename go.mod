@@ -1,8 +1,12 @@
-module redis
+module byoa
 
-go 1.20
+go 1.19
 
-require github.com/redis/go-redis/v9 v9.0.2
+require (
+	github.com/google/uuid v1.3.0
+	github.com/gorilla/mux v1.8.0
+	github.com/redis/go-redis/v9 v9.0.2
+)
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
