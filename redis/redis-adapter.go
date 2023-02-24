@@ -39,12 +39,15 @@ func Search(uuid, term string) (bool, error) {
 	return strings.Contains(val, term), nil
 }
 
-func GetText(uuid string) (string, error) {
+func GetText(uuid string) (string, bool, error) {
 	val, err := rdb.Get(ctx, uuid).Result()
 	if err != nil {
-		return "", err
+		if err == redis.Nil {
+			return "", false, nil
+		}
+		return "", false, err
 	}
-	return val, nil
+	return val, true, nil
 }
 
 func Delete(uuid string) error {
