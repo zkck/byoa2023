@@ -46,13 +46,21 @@ func Store(uuid, value string) error {
 }
 
 func Search(uuid, term string) (bool, bool, error) {
-	_, err := rdbTokes.Get(ctx, term+"##!##"+uuid).Result()
-
+	_, err := rdbTexts.Get(ctx, uuid).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return false, false, nil
 		}
 		return false, false, err
+	}
+
+	_, err = rdbTokes.Get(ctx, term+"##!##"+uuid).Result()
+
+	if err != nil {
+		if err == redis.Nil {
+			return false, true, nil
+		}
+		return false, true, err
 	}
 	return true, true, nil
 }
