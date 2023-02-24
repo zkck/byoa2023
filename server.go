@@ -80,7 +80,6 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 
 	// get text from store
-	//data, ok := store[uuid]
 	data, found, err := redis.GetText(uuid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
