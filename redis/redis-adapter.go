@@ -77,7 +77,7 @@ func GetText(uuid string) (string, bool, error) {
 }
 
 func Delete(uuid string) (bool, error) {
-	value, _, err := GetText(uuid)
+	_, _, err := GetText(uuid)
 	if err != nil {
 		if err == redis.Nil {
 			return false, nil
@@ -86,14 +86,15 @@ func Delete(uuid string) (bool, error) {
 	}
 
 	_, err = rdbTexts.Del(ctx, uuid).Result()
-	splitValue := strings.Split(value, " ")
-	for _, element := range splitValue {
-		err = rdbTokes.Del(ctx, element+"##!##"+uuid).Err()
-	}
+	/*
+		splitValue := strings.Split(value, " ")
+		for _, element := range splitValue {
+			err = rdbTokes.Del(ctx, element+"##!##"+uuid).Err()
+		}*/
 	if err != nil {
-		if err == redis.Nil {
+		/*if err == redis.Nil {
 			return false, nil
-		}
+		}*/
 		return false, err
 	}
 	return true, nil
