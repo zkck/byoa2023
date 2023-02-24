@@ -50,10 +50,13 @@ func GetText(uuid string) (string, bool, error) {
 	return val, true, nil
 }
 
-func Delete(uuid string) error {
+func Delete(uuid string) (bool, error) {
 	_, err := rdb.Del(ctx, uuid).Result()
 	if err != nil {
-		return err
+		if err == redis.Nil {
+			return false, nil
+		}
+		return false, err
 	}
-	return nil
+	return true, nil
 }
