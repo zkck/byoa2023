@@ -11,7 +11,7 @@ RUN go mod download
 COPY *.go ./
 COPY redis/*.go ./redis/
 
-RUN go build -o /docker-gs-ping
+RUN GOOS=linux GOARCH=amd64 go build -o /docker-gs-ping
 
 EXPOSE 8080
 
