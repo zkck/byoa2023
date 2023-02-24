@@ -9,6 +9,7 @@ COPY go.sum ./
 RUN go mod download
 
 COPY *.go ./
+COPY redis/*.go ./redis/
 
 RUN go build -o /docker-gs-ping
 
