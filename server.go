@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"byoa/redis"
 
@@ -57,6 +56,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, Error{Error: err.Error()})
+		return
 	}
 
 	resp := PostResp{
@@ -85,6 +85,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, Error{Error: err.Error()})
+		return
 	}
 	if !found {
 		w.WriteHeader(http.StatusNotFound)
@@ -106,18 +107,15 @@ func DeleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, ok := store[uuid]
-	if !ok {
-		w.WriteHeader(http.StatusNotFound)
-		encoder.Encode(Error{Error: "not found"})
-		return
-	}
-
-	//delete(store, uuid)
-	err := redis.Delete(uuid)
+	found, err := redis.Delete(uuid)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, Error{Error: err.Error()})
+		return
+	}
+	if !found {
+		w.WriteHeader(http.StatusNotFound)
+		encoder.Encode(Error{Error: "not found"})
 		return
 	}
 
@@ -148,15 +146,20 @@ func SearchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get text from store
-	data, ok := store[uuid]
-	if !ok {
+	match, found, err := redis.Search(uuid, term)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, Error{Error: err.Error()})
+		return
+	}
+	if !found {
 		w.WriteHeader(http.StatusNotFound)
 		encoder.Encode(Error{Error: "not found"})
 		return
 	}
 
 	var res Result
-	if strings.Contains(data, term) {
+	if match {
 		res.Found = true
 	}
 
