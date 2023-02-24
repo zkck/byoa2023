@@ -30,13 +30,16 @@ func Store(uuid, value string) error {
 	return nil
 }
 
-func Search(uuid, term string) (bool, error) {
+func Search(uuid, term string) (bool, bool, error) {
 	val, err := rdb.Get(ctx, uuid).Result()
 
 	if err != nil {
-		return false, err
+		if err == redis.Nil {
+			return false, false, nil
+		}
+		return false, false, err
 	}
-	return strings.Contains(val, term), nil
+	return strings.Contains(val, term), true, nil
 }
 
 func GetText(uuid string) (string, bool, error) {
