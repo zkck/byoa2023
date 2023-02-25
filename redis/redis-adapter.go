@@ -45,6 +45,7 @@ func Store(uuid, value string) error {
 	return nil
 }
 
+// match / found / error
 func Search(uuid, term string) (bool, bool, error) {
 	_, err := rdbTexts.Get(ctx, uuid).Result()
 	if err != nil {
